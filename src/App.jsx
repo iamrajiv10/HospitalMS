@@ -1,11 +1,16 @@
 import React, { useMemo } from 'react';
-import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { createAppTheme } from './theme';
-import { AuthProvider } from './contexts/AuthContext';
-import { TenantProvider } from './contexts/TenantContext';
-import { NotificationProvider } from './contexts/NotificationContext';
-import AppRoutes from './routes';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Layout from './layout/Layout';
+import Login from './Login';
+
+// Inner shell handling authentication state
+const AppContent = () => {
+  const { isAuthenticated } = useAuth();
+
+  return isAuthenticated ? <Layout /> : <Login />;
+};
 
 function App() {
   const theme = useMemo(() => createAppTheme('light'), []);
@@ -13,18 +18,11 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <NotificationProvider>
-        <AuthProvider>
-          <TenantProvider>
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </TenantProvider>
-        </AuthProvider>
-      </NotificationProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ThemeProvider>
   );
 }
 
 export default App;
-

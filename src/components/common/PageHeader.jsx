@@ -5,7 +5,7 @@ export const PageHeader = ({ title, subtitle, roleBadge, action }) => {
   return (
     <Box
       sx={{
-        mb: 4,
+        mb: 3,
         display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between',
@@ -40,4 +40,3 @@ export const PageHeader = ({ title, subtitle, roleBadge, action }) => {
 };
 
 export default PageHeader;
-

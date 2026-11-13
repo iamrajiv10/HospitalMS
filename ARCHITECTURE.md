@@ -1,228 +1,127 @@
-# CuraCloud - Multi-Tenant Hospital Management System (SaaS)
+# CuraCloud - Hospital Management SaaS
 
-> **Architectural Specification & Role-Based Access Control (RBAC) Guide**  
-> Built with **React.js + Vite + Material UI (MUI)**
+## 🌟 Application Workflow & Architecture
 
----
-
-## 1. Executive Overview
-
-**CuraCloud** is a scalable, cloud-native Multi-Tenant Software-as-a-Service (SaaS) platform for hospital operations. Multiple independent hospitals can onboard onto the same platform instance while maintaining **strict data isolation** and **role-based security**.
-
-### Fundamental Multi-Tenant Principle:
-- **Super Admin (Platform Owner)**: Operates at the global infrastructure layer. Can onboard new hospital tenants, manage subscription billing, view platform metrics, and configure global policies. Does not belong to any single hospital tenant.
-- **Hospital Admin (Tenant Owner)**: Operates strictly within their own hospital tenant (`tenantId`). Can manage departments, invite and assign staff members (Receptionist, Doctor, Inventory Manager, Ward Manager), and manage hospital configurations.
-- **Cross-Tenant Isolation Guarantee**: A Hospital Admin or staff member from *Hospital A* can **never** access, view, or modify data from *Hospital B*. All API requests and routing logic are bounded by tenant context.
-
----
-
-## 2. Roles & Responsibilities Matrix
-
-| Role | Scope | Primary Responsibilities | Default Home Route |
-| :--- | :--- | :--- | :--- |
-| **Super Admin** | Platform Global | Onboard hospitals, manage subscriptions, platform settings, infrastructure health | `/super-admin/dashboard` |
-| **Hospital Admin** | Single Hospital | Hospital profile, staff management, role assignments, department access | `/hospital-admin/dashboard` |
-| **Receptionist** | Single Hospital | Patient registration, OPD appointment scheduling, billing & cashier receipts | `/receptionist/dashboard` |
-| **Doctor** | Single Hospital | Electronic Medical Records (EMR), patient diagnoses, digital prescriptions (Rx) | `/doctor/dashboard` |
-| **Inventory Manager** | Single Hospital | Pharmacy catalog, drug stock alerts, batch expiry tracking, pharma suppliers | `/inventory/dashboard` |
-| **Ward Manager** | Single Hospital | Bed matrix, ICU & general ward occupancy, admission intake, discharge clearance | `/wards/dashboard` |
+### 1. Unified Authentication Workflow
+- **Single Common Login Page (`Login.jsx`)**: All roles (Super Admin, Hospital Admin, Receptionist, Doctor, Inventory Manager, Ward Manager) authenticate via this unified entry point.
+- **Login API Response Model**: Upon successful credentials verification, the backend returns:
+  ```json
+  {
+    "token": "jwt-session-token",
+    "hospital_id": "HOSP-APOLLO-01",
+    "role": "HOSPITAL_ADMIN",
+    "user_name": "Dr. Ramesh Sharma",
+    "user_email": "admin@apollo.curacloud.health",
+    "hospital_name": "Apollo Multispeciality Hospital",
+    "hospital_logo": "https://images.unsplash.com/..."
+  }
+  ```
+- **Persistent Storage & Network Security**:
+  - The `hospital_id`, `role`, `user_name`, `hospital_name`, and `hospital_logo` are saved in persistent storage (`localStorage`) via [`AuthContext.jsx`](file:///c:/Users/Rajiv%20Kumar/Desktop/Fn-Mafia/New%20folder%20(2)/Hospital/src/context/AuthContext.jsx).
+  - All subsequent network calls automatically pass `hospital_id` as the **Bearer token** (`Authorization: Bearer <hospital_id>`) via [`apiClient.js`](file:///c:/Users/Rajiv%20Kumar/Desktop/Fn-Mafia/New%20folder%20(2)/Hospital/src/services/apiClient.js).
 
 ---
 
-## 3. Directory & Folder Structure
+### 2. Layout Structure & Proportions
 
-The project follows a **Feature-Slices by Domain & Role** architecture. Every role has its own dedicated directory containing its pages, components, and services, making maintenance and scalability effortless.
+The common application layout ([`Layout.jsx`](file:///c:/Users/Rajiv%20Kumar/Desktop/Fn-Mafia/New%20folder%20(2)/Hospital/src/layout/Layout.jsx)) coordinates four sub-components:
+
+1. **Header (`Header.jsx`)**:
+   - **Left Corner**: Hospital Logo (`hospital_logo`) + Hospital Legal Name (`hospital_name`) from login API response.
+   - **Right Corner**: User Profile Name (`user_name`) + Current Role Badge (`role`) + Quick Role Demo Switcher + Logout.
+2. **Sidebar / Sidepanel (`Sidebar.jsx`)**:
+   - Occupies **10%** of the screen width on the left.
+   - Displays a dynamic navigation dataset tailored to the user's role (6 distinct sets configured in `Layout.jsx`).
+   - Defaults to the **1st section's page** upon logging in or switching roles.
+3. **Main Section (`MainSection.jsx`)**:
+   - Occupies the remaining **90%** of the screen width on the right.
+   - Renders the active page selected from the sidebar.
+4. **Footer (`Footer.jsx`)**:
+   - Common bottom bar displaying copyright, tenant session identifier, and platform status.
+
+---
+
+### 3. Folder Structure
 
 ```
 Hospital/
-├── index.html                           # Single page entry HTML
-├── package.json                         # Project dependencies and build scripts
-├── vite.config.js                       # Vite build configuration (Port 3000)
+├── package.json                         # Dependencies & scripts
+├── vite.config.js                       # Vite dev server configuration
+├── ARCHITECTURE.md                      # Architecture & RBAC Guide
 ├── README.md                            # Quickstart instructions
-├── ARCHITECTURE.md                      # Complete SaaS Architecture Guide (This file)
-├── public/
-│   └── vite.svg                         # Application favicon
 └── src/
     ├── main.jsx                         # React 18 DOM mount point
-    ├── App.jsx                          # Theme, Context Providers, Router wrapper
+    ├── App.jsx                          # Main App shell & theme provider
+    ├── Login.jsx                        # 🌟 Common login page for all roles
     │
-    ├── config/                          # Central constants and role definitions
-    │   ├── constants.js                 # App configuration & LocalStorage keys
-    │   └── roles.js                     # ROLES enum, ROLE_LABELS, ROLE_PERMISSIONS, ROLE_HOME_ROUTES
+    ├── layout/                          # 🌟 Layout folder
+    │   ├── Header.jsx                   # Hospital logo (left), User name & role (right)
+    │   ├── Sidebar.jsx                  # 10% width left navigation sidepanel
+    │   ├── MainSection.jsx              # 90% width main content area (opens 1st page by default)
+    │   ├── Footer.jsx                   # Common bottom footer
+    │   └── Layout.jsx                   # Connects all parts + defines SIDEBAR_MENU_DATA for 6 roles
     │
-    ├── theme/                           # Material UI Design System
-    │   └── index.js                     # Custom palette, typography, borderRadius, component overrides
+    ├── Components/                      # 🌟 Components folder partitioned by role
+    │   ├── common/                      # Reusable UI widgets (PageHeader, StatCard)
+    │   │   ├── PageHeader.jsx
+    │   │   └── StatCard.jsx
+    │   │
+    │   ├── SuperAdmin/                  # Super Admin role pages
+    │   │   ├── SuperAdminDashboard.jsx
+    │   │   ├── HospitalDirectoryPage.jsx
+    │   │   ├── SubscriptionPlansPage.jsx
+    │   │   └── PlatformSettingsPage.jsx
+    │   │
+    │   ├── HospitalAdmin/               # Hospital Admin role pages (can add other staff roles)
+    │   │   ├── HospitalAdminDashboard.jsx
+    │   │   ├── StaffManagementPage.jsx  # Add Doctors, Receptionists, Inventory, Ward Managers
+    │   │   ├── RolesPermissionsPage.jsx
+    │   │   └── HospitalSettingsPage.jsx
+    │   │
+    │   ├── Receptionist/                # Receptionist role pages
+    │   │   ├── ReceptionistDashboard.jsx
+    │   │   ├── PatientRegistrationPage.jsx
+    │   │   ├── AppointmentsPage.jsx
+    │   │   └── BillingPage.jsx
+    │   │
+    │   ├── Doctor/                      # Doctor role pages
+    │   │   ├── DoctorDashboard.jsx
+    │   │   ├── PatientRecordsPage.jsx   # Clinical EMR
+    │   │   ├── PrescriptionsPage.jsx    # Digital Rx
+    │   │   └── ConsultationsPage.jsx
+    │   │
+    │   ├── InventoryManager/            # Inventory Manager role pages
+    │   │   ├── InventoryDashboard.jsx
+    │   │   ├── MedicinesStockPage.jsx
+    │   │   └── SuppliersPage.jsx
+    │   │
+    │   └── WardManager/                 # Ward Manager role pages
+    │       ├── WardDashboard.jsx
+    │       ├── BedAllocationPage.jsx    # Real-time bed grid
+    │       └── AdmissionsDischargesPage.jsx
     │
-    ├── contexts/                        # React Context State Management
-    │   ├── AuthContext.jsx              # Current user session, role, login/logout, demo role switcher
-    │   ├── TenantContext.jsx            # Current hospital tenant, cross-tenant isolation enforcement
-    │   └── NotificationContext.jsx      # Global MUI snackbar alerts and feedback toasts
+    ├── context/                         # State management
+    │   └── AuthContext.jsx              # Stores login response data (hospital_id, role, name, logo)
     │
-    ├── services/                        # API & Networking
-    │   ├── apiClient.js                 # HTTP client with automatic 'X-Tenant-ID' and Bearer headers
-    │   └── mockData.js                  # Preloaded tenants (Apollo, Fortis, Max) and test users for all 6 roles
+    ├── services/                        # Networking & mock data
+    │   ├── apiClient.js                 # Automatically injects 'Bearer <hospital_id>' into all API calls
+    │   └── mockData.js                  # Mock tenants & users
     │
-    ├── utils/                           # Helper utilities
-    │   └── rbac.js                      # 'hasRole', 'hasPermission', 'canAccessTenantData'
+    ├── config/                          # Role enums & app constants
+    │   ├── roles.js                     # ROLES, ROLE_LABELS, ROLE_PERMISSIONS
+    │   └── constants.js
     │
-    ├── components/                      # Shared, generic UI components
-    │   ├── common/
-    │   │   ├── PageHeader.jsx           # Standard header with title, subtitle, role badge & action buttons
-    │   │   ├── StatCard.jsx             # Key Performance Indicator (KPI) metric widget
-    │   │   └── LoadingSpinner.jsx       # Standard progress indicator
-    │   └── feedback/
-    │       └── UnauthorizedView.jsx     # Friendly "Access Denied" screen for unauthorized attempts
-    │
-    ├── layouts/                         # Page shells and chrome
-    │   ├── AuthLayout.jsx               # Centered card layout for Login & Public screens
-    │   ├── DashboardLayout.jsx          # App shell: Topbar + Responsive Sidebar + Dynamic Container
-    │   └── components/
-    │       ├── Topbar.jsx               # Header with Tenant indicator, Role switcher menu, Profile
-    │       ├── Sidebar.jsx              # Role-filtered drawer navigation
-    │       └── TenantIndicator.jsx      # Badge displaying active hospital name & isolation guarantee
-    │
-    ├── routes/                          # Routing logic & Access control
-    │   ├── index.jsx                    # Central React Router route tree
-    │   ├── ProtectedRoute.jsx           # Guard: verifies authentication, role clearance, and tenant ID
-    │   └── navigationConfig.js          # Sidebar links mapped to each role
-    │
-    └── features/                        # Feature modules partitioned by domain and role
-        ├── auth/                        # Authentication & Onboarding
-        │   └── pages/
-        │       ├── LoginPage.jsx
-        │       └── HospitalOnboardingPage.jsx
-        │
-        ├── superAdmin/                  # 1. Super Admin Features
-        │   └── pages/
-        │       ├── SuperAdminDashboard.jsx
-        │       ├── HospitalDirectoryPage.jsx
-        │       ├── SubscriptionPlansPage.jsx
-        │       └── PlatformSettingsPage.jsx
-        │
-        ├── hospitalAdmin/               # 2. Hospital Admin Features
-        │   └── pages/
-        │       ├── HospitalAdminDashboard.jsx
-        │       ├── StaffManagementPage.jsx       # Add Receptionists, Doctors, etc.
-        │       ├── RolesPermissionsPage.jsx
-        │       └── HospitalSettingsPage.jsx
-        │
-        ├── receptionist/                # 3. Receptionist Features
-        │   └── pages/
-        │       ├── ReceptionistDashboard.jsx
-        │       ├── PatientRegistrationPage.jsx
-        │       ├── AppointmentsPage.jsx
-        │       └── BillingPage.jsx
-        │
-        ├── doctor/                      # 4. Doctor Features
-        │   └── pages/
-        │       ├── DoctorDashboard.jsx
-        │       ├── PatientRecordsPage.jsx
-        │       ├── PrescriptionsPage.jsx
-        │       └── ConsultationsPage.jsx
-        │
-        ├── inventoryManager/            # 5. Inventory Manager Features
-        │   └── pages/
-        │       ├── InventoryDashboard.jsx
-        │       ├── MedicinesStockPage.jsx
-        │       └── SuppliersPage.jsx
-        │
-        └── wardManager/                 # 6. Ward Manager Features
-            └── pages/
-                ├── WardDashboard.jsx
-                ├── BedAllocationPage.jsx
-                └── AdmissionsDischargesPage.jsx
+    └── theme/                           # Material UI design system
+        └── index.js
 ```
 
 ---
 
-## 4. How to Add a New Page or Feature in 3 Steps
+### 4. How to Add a New Page or Section for Any Role
 
-Adding a new module or page for **any role** is straightforward and takes less than 3 minutes:
-
-### Step 1: Create your Page Component
-Create your new page under the appropriate role directory in `src/features/<roleName>/pages/`:
-```jsx
-// src/features/doctor/pages/LabReportsPage.jsx
-import React from 'react';
-import PageHeader from '../../../components/common/PageHeader';
-
-export const LabReportsPage = () => {
-  return (
-    <>
-      <PageHeader
-        title="Diagnostic & Pathology Lab Reports"
-        subtitle="Review inbound laboratory test reports and culture results."
-        roleBadge="Doctor"
-      />
-      {/* Your components here */}
-    </>
-  );
-};
-
-export default LabReportsPage;
-```
-
-### Step 2: Register the Route in `src/routes/index.jsx`
-Add the route under the role's section and wrap it in `<ProtectedRoute allowedRoles={[ROLES.DOCTOR]} requireTenant>`:
-```jsx
-import LabReportsPage from '../features/doctor/pages/LabReportsPage';
-
-// Inside AppRoutes:
-<Route
-  path="/doctor/lab-reports"
-  element={
-    <ProtectedRoute allowedRoles={[ROLES.DOCTOR]} requireTenant>
-      <LabReportsPage />
-    </ProtectedRoute>
-  }
-/>
-```
-
-### Step 3: Add to Sidebar Navigation in `src/routes/navigationConfig.js`
-Add an entry to `ROLE_NAVIGATION[ROLES.DOCTOR]`:
-```js
-import ScienceIcon from '@mui/icons-material/Science';
-
-// In ROLE_NAVIGATION[ROLES.DOCTOR]:
-{ 
-  label: 'Lab Reports', 
-  path: '/doctor/lab-reports', 
-  icon: ScienceIcon 
-}
-```
-*Done! The link automatically displays in the sidebar only when a Doctor logs in, and the route is guarded.*
-
----
-
-## 5. Security & Isolation Strategy
-
-### A. HTTP Request Isolation (`apiClient.js`)
-Every request sent to the API automatically attaches the client's tenant identifier:
-```http
-GET /api/v1/patients HTTP/1.1
-Authorization: Bearer <jwt-token>
-X-Tenant-ID: hosp-apollo
-```
-On the backend (PostgreSQL / MySQL / MongoDB):
-- Data queries are filtered by `WHERE tenant_id = current_tenant_id` (Row-Level Security) OR routed to isolated tenant schemas.
-
-### B. Client-side Route Guarding (`ProtectedRoute.jsx`)
-1. **Unauthenticated Redirect**: Unauthenticated users are redirected to `/login`.
-2. **Role Mismatch Shield**: If a Receptionist tries to access `/hospital-admin/staff`, the route intercepts and renders an `UnauthorizedView` stating the role requirement without leaking confidential pages.
-3. **Tenant Absence Shield**: Staff cannot view tenant modules if no tenant context is established.
-
----
-
-## 6. Testing All 6 Roles Out-of-the-Box (Demo Mode)
-
-The application includes a built-in **Quick Role Switcher** in the Top Header:
-1. Click **"Switch Role"** in the top navigation bar.
-2. Select any role:
-   - **Super Admin**: Explore platform-wide SaaS metrics and onboard new hospitals.
-   - **Hospital Admin (Apollo)**: Manage Apollo Hospital staff, bed counts, and role permissions.
-   - **Hospital Admin (Fortis)**: Demonstrates tenant isolation (different staff, different tenant context).
-   - **Receptionist**: Register patients and manage appointment queues.
-   - **Doctor**: Inspect clinical EMR and issue digital prescriptions.
-   - **Inventory Manager**: Check drug inventory and low stock alerts.
-   - **Ward Manager**: View real-time bed occupancy grid and admissions.
-
+1. **Create the component** in `src/Components/<Role>/NewPage.jsx`.
+2. **Register the section** in [`src/layout/Layout.jsx`](file:///c:/Users/Rajiv%20Kumar/Desktop/Fn-Mafia/New%20folder%20(2)/Hospital/src/layout/Layout.jsx) under `SIDEBAR_MENU_DATA[ROLES.<ROLE>]`:
+   ```javascript
+   { id: 'newpage', label: 'New Section', icon: YourIcon, component: NewPage }
+   ```
+3. *Done!* The new section immediately displays in that role's sidebar, and clicking it renders in the 90% main section.
