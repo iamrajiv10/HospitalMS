@@ -5,11 +5,14 @@ import MedicationIcon from '@mui/icons-material/Medication';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import { useNavigate } from 'react-router-dom';
 
 import PageHeader from '../common/PageHeader';
 import StatCard from '../common/StatCard';
 
-export const DoctorDashboard = ({ onNavigate }) => {
+export const DoctorDashboard = () => {
+  const navigate = useNavigate();
+
   const patientsQueue = [
     { token: 'T-12', name: 'Rahul Verma', reason: 'Hypertension Follow-up', vitals: 'BP 138/88, Pulse 76', status: 'In Consultation' },
     { token: 'T-14', name: 'Suresh Menon', reason: 'Chest Discomfort / Angina check', vitals: 'BP 145/92, Pulse 84', status: 'Next Up' },
@@ -26,7 +29,7 @@ export const DoctorDashboard = ({ onNavigate }) => {
           <Button
             variant="contained"
             startIcon={<EditNoteIcon />}
-            onClick={() => onNavigate && onNavigate('prescriptions')}
+            onClick={() => navigate('/doctor/prescriptions')}
           >
             New Prescription
           </Button>
@@ -78,7 +81,7 @@ export const DoctorDashboard = ({ onNavigate }) => {
             <Typography variant="h6" fontWeight={700}>
               Today's Consultation Lineup
             </Typography>
-            <Button size="small" onClick={() => onNavigate && onNavigate('patients')}>
+            <Button size="small" onClick={() => navigate('/doctor/patients')}>
               Access Full Records
             </Button>
           </Stack>
@@ -118,4 +121,3 @@ export const DoctorDashboard = ({ onNavigate }) => {
 };
 
 export default DoctorDashboard;
-

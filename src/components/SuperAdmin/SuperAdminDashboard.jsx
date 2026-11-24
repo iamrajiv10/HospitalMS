@@ -5,12 +5,15 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import DnsIcon from '@mui/icons-material/Dns';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { useNavigate } from 'react-router-dom';
 
 import PageHeader from '../common/PageHeader';
 import StatCard from '../common/StatCard';
 import { MOCK_HOSPITALS } from '../../services/mockData';
 
-export const SuperAdminDashboard = ({ onNavigate }) => {
+export const SuperAdminDashboard = () => {
+  const navigate = useNavigate();
+
   return (
     <>
       <PageHeader
@@ -22,7 +25,7 @@ export const SuperAdminDashboard = ({ onNavigate }) => {
             variant="contained"
             color="primary"
             startIcon={<AddCircleOutlineIcon />}
-            onClick={() => onNavigate && onNavigate('hospitals')}
+            onClick={() => navigate('/super-admin/hospitals')}
           >
             Onboard New Hospital
           </Button>
@@ -74,7 +77,7 @@ export const SuperAdminDashboard = ({ onNavigate }) => {
             <Typography variant="h6" fontWeight={700}>
               Hospital Tenants Directory
             </Typography>
-            <Button size="small" onClick={() => onNavigate && onNavigate('hospitals')}>
+            <Button size="small" onClick={() => navigate('/super-admin/hospitals')}>
               View All ({MOCK_HOSPITALS.length})
             </Button>
           </Stack>
@@ -112,4 +115,3 @@ export const SuperAdminDashboard = ({ onNavigate }) => {
 };
 
 export default SuperAdminDashboard;
-

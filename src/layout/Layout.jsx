@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Box } from '@mui/material';
 
 // Icons for Sidebar menus
@@ -60,42 +60,42 @@ import AdmissionsDischargesPage from '../Components/WardManager/AdmissionsDischa
 
 /**
  * 6 DIFFERENT SETS OF SIDEBAR/SIDEPANEL DATA FOR EACH ROLE
- * Easily extensible: add, edit or remove sections here as requirements evolve.
+ * Each page has its own dedicated, unique URL path.
  */
 export const SIDEBAR_MENU_DATA = {
   [ROLES.SUPER_ADMIN]: [
-    { id: 'dashboard', label: 'Platform Hub', icon: DashboardIcon, component: SuperAdminDashboard },
-    { id: 'hospitals', label: 'Hospitals Directory', icon: LocalHospitalIcon, component: HospitalDirectoryPage },
-    { id: 'subscriptions', label: 'SaaS Subscriptions', icon: SubscriptionsIcon, component: SubscriptionPlansPage },
-    { id: 'settings', label: 'Platform Settings', icon: SettingsIcon, component: PlatformSettingsPage }
+    { id: 'dashboard', label: 'Platform Hub', path: '/super-admin/dashboard', icon: DashboardIcon, component: SuperAdminDashboard },
+    { id: 'hospitals', label: 'Hospitals Directory', path: '/super-admin/hospitals', icon: LocalHospitalIcon, component: HospitalDirectoryPage },
+    { id: 'subscriptions', label: 'SaaS Subscriptions', path: '/super-admin/subscriptions', icon: SubscriptionsIcon, component: SubscriptionPlansPage },
+    { id: 'settings', label: 'Platform Settings', path: '/super-admin/settings', icon: SettingsIcon, component: PlatformSettingsPage }
   ],
   [ROLES.HOSPITAL_ADMIN]: [
-    { id: 'dashboard', label: 'Hospital Hub', icon: DashboardIcon, component: HospitalAdminDashboard },
-    { id: 'staff', label: 'Staff & Roles', icon: PeopleAltIcon, component: StaffManagementPage },
-    { id: 'roles', label: 'RBAC Permissions', icon: AdminPanelSettingsIcon, component: RolesPermissionsPage },
-    { id: 'settings', label: 'Hospital Settings', icon: SettingsIcon, component: HospitalSettingsPage }
+    { id: 'dashboard', label: 'Hospital Hub', path: '/hospital-admin/dashboard', icon: DashboardIcon, component: HospitalAdminDashboard },
+    { id: 'staff', label: 'Staff & Roles', path: '/hospital-admin/staff', icon: PeopleAltIcon, component: StaffManagementPage },
+    { id: 'roles', label: 'RBAC Permissions', path: '/hospital-admin/roles', icon: AdminPanelSettingsIcon, component: RolesPermissionsPage },
+    { id: 'settings', label: 'Hospital Settings', path: '/hospital-admin/settings', icon: SettingsIcon, component: HospitalSettingsPage }
   ],
   [ROLES.RECEPTIONIST]: [
-    { id: 'dashboard', label: 'Front Desk Hub', icon: DashboardIcon, component: ReceptionistDashboard },
-    { id: 'patients', label: 'Patient Registration', icon: HowToRegIcon, component: PatientRegistrationPage },
-    { id: 'appointments', label: 'Appointments', icon: EventNoteIcon, component: AppointmentsPage },
-    { id: 'billing', label: 'Billing & Cashier', icon: ReceiptIcon, component: BillingPage }
+    { id: 'dashboard', label: 'Front Desk Hub', path: '/receptionist/dashboard', icon: DashboardIcon, component: ReceptionistDashboard },
+    { id: 'patients', label: 'Patient Registration', path: '/receptionist/patients', icon: HowToRegIcon, component: PatientRegistrationPage },
+    { id: 'appointments', label: 'Appointments', path: '/receptionist/appointments', icon: EventNoteIcon, component: AppointmentsPage },
+    { id: 'billing', label: 'Billing & Cashier', path: '/receptionist/billing', icon: ReceiptIcon, component: BillingPage }
   ],
   [ROLES.DOCTOR]: [
-    { id: 'dashboard', label: 'Doctor Hub', icon: DashboardIcon, component: DoctorDashboard },
-    { id: 'patients', label: 'Clinical Records (EMR)', icon: MedicalInformationIcon, component: PatientRecordsPage },
-    { id: 'prescriptions', label: 'Prescriptions (Rx)', icon: MedicationIcon, component: PrescriptionsPage },
-    { id: 'consultations', label: 'Consultations', icon: AssessmentIcon, component: ConsultationsPage }
+    { id: 'dashboard', label: 'Doctor Hub', path: '/doctor/dashboard', icon: DashboardIcon, component: DoctorDashboard },
+    { id: 'patients', label: 'Clinical Records (EMR)', path: '/doctor/patients', icon: MedicalInformationIcon, component: PatientRecordsPage },
+    { id: 'prescriptions', label: 'Prescriptions (Rx)', path: '/doctor/prescriptions', icon: MedicationIcon, component: PrescriptionsPage },
+    { id: 'consultations', label: 'Consultations', path: '/doctor/consultations', icon: AssessmentIcon, component: ConsultationsPage }
   ],
   [ROLES.INVENTORY_MANAGER]: [
-    { id: 'dashboard', label: 'Inventory Hub', icon: DashboardIcon, component: InventoryDashboard },
-    { id: 'medicines', label: 'Medicines & Stock', icon: Inventory2Icon, component: MedicinesStockPage },
-    { id: 'suppliers', label: 'Suppliers & Vendors', icon: LocalShippingIcon, component: SuppliersPage }
+    { id: 'dashboard', label: 'Inventory Hub', path: '/inventory/dashboard', icon: DashboardIcon, component: InventoryDashboard },
+    { id: 'medicines', label: 'Medicines & Stock', path: '/inventory/medicines', icon: Inventory2Icon, component: MedicinesStockPage },
+    { id: 'suppliers', label: 'Suppliers & Vendors', path: '/inventory/suppliers', icon: LocalShippingIcon, component: SuppliersPage }
   ],
   [ROLES.WARD_MANAGER]: [
-    { id: 'dashboard', label: 'Ward Hub', icon: DashboardIcon, component: WardDashboard },
-    { id: 'beds', label: 'Bed Matrix', icon: HotelIcon, component: BedAllocationPage },
-    { id: 'admissions', label: 'Admissions / Discharge', icon: TransferWithinAStationIcon, component: AdmissionsDischargesPage }
+    { id: 'dashboard', label: 'Ward Hub', path: '/ward/dashboard', icon: DashboardIcon, component: WardDashboard },
+    { id: 'beds', label: 'Bed Matrix', path: '/ward/beds', icon: HotelIcon, component: BedAllocationPage },
+    { id: 'admissions', label: 'Admissions / Discharge', path: '/ward/admissions', icon: TransferWithinAStationIcon, component: AdmissionsDischargesPage }
   ]
 };
 
@@ -104,20 +104,6 @@ export const Layout = () => {
 
   // Get active menu list for current role (fallback to Hospital Admin)
   const menuItems = (role && SIDEBAR_MENU_DATA[role]) || SIDEBAR_MENU_DATA[ROLES.HOSPITAL_ADMIN];
-
-  // Default active section: 1st section's page of the left panel
-  const [activeMenuId, setActiveMenuId] = useState(menuItems[0]?.id || 'dashboard');
-
-  // Whenever role changes from login or switcher, reset to the 1st section's page by default
-  useEffect(() => {
-    if (menuItems && menuItems.length > 0) {
-      setActiveMenuId(menuItems[0].id);
-    }
-  }, [role]);
-
-  // Find component to display in MainSection
-  const activeItem = menuItems.find((item) => item.id === activeMenuId) || menuItems[0];
-  const ActiveComponent = activeItem?.component || null;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -133,17 +119,10 @@ export const Layout = () => {
         }}
       >
         {/* Left Side: Sidebar taking 10% width */}
-        <Sidebar
-          menuItems={menuItems}
-          activeMenuId={activeMenuId}
-          onSelectMenu={setActiveMenuId}
-        />
+        <Sidebar menuItems={menuItems} />
 
-        {/* Right Side: MainSection taking remaining 90% width */}
-        <MainSection
-          activeComponent={ActiveComponent}
-          onNavigate={setActiveMenuId}
-        />
+        {/* Right Side: MainSection taking remaining 90% width (renders active router page via Outlet) */}
+        <MainSection />
       </Box>
 
       {/* 3. Bottom Common Footer */}
@@ -153,4 +132,3 @@ export const Layout = () => {
 };
 
 export default Layout;
-

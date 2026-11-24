@@ -5,11 +5,14 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import PostAddIcon from '@mui/icons-material/PostAdd';
+import { useNavigate } from 'react-router-dom';
 
 import PageHeader from '../common/PageHeader';
 import StatCard from '../common/StatCard';
 
-export const InventoryDashboard = ({ onNavigate }) => {
+export const InventoryDashboard = () => {
+  const navigate = useNavigate();
+
   const stockAlerts = [
     { code: 'MED-104', name: 'Amoxicillin 500mg', current: 40, threshold: 100, unit: 'Strips', status: 'Low Stock' },
     { code: 'MED-219', name: 'Normal Saline (IV 500ml)', current: 15, threshold: 50, unit: 'Bottles', status: 'Critical' },
@@ -26,7 +29,7 @@ export const InventoryDashboard = ({ onNavigate }) => {
           <Button
             variant="contained"
             startIcon={<PostAddIcon />}
-            onClick={() => onNavigate && onNavigate('medicines')}
+            onClick={() => navigate('/inventory/medicines')}
           >
             Add Drug / Stock In
           </Button>
@@ -78,7 +81,7 @@ export const InventoryDashboard = ({ onNavigate }) => {
             <Typography variant="h6" fontWeight={700}>
               Critical Stock Depletion Alerts
             </Typography>
-            <Button size="small" onClick={() => onNavigate && onNavigate('medicines')}>
+            <Button size="small" onClick={() => navigate('/inventory/medicines')}>
               View Full Pharmacy Stock
             </Button>
           </Stack>
@@ -120,4 +123,3 @@ export const InventoryDashboard = ({ onNavigate }) => {
 };
 
 export default InventoryDashboard;
-

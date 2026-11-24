@@ -15,13 +15,14 @@ import {
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import { useNavigate } from 'react-router-dom';
 import { useAuth, PRESET_USERS } from '../context/AuthContext';
-import { ROLE_LABELS } from '../config/roles';
+import { ROLE_LABELS, ROLE_HOME_ROUTES } from '../config/roles';
 
 export const Header = () => {
   const { authData, logout, switchRole } = useAuth();
+  const navigate = useNavigate();
   const [profileAnchor, setProfileAnchor] = useState(null);
   const [roleAnchor, setRoleAnchor] = useState(null);
 
@@ -34,6 +35,15 @@ export const Header = () => {
   const handleSelectRole = (targetRole, hospitalId) => {
     switchRole(targetRole, hospitalId);
     handleRoleClose();
+    if (ROLE_HOME_ROUTES[targetRole]) {
+      navigate(ROLE_HOME_ROUTES[targetRole]);
+    }
+  };
+
+  const handleLogout = () => {
+    handleProfileClose();
+    logout();
+    navigate('/');
   };
 
   return (
@@ -87,7 +97,7 @@ export const Header = () => {
         {/* Right Corner: Name of the logged in user, his role + Switcher / Logout */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {/* Quick Role Switcher Demo Menu */}
-          {/* <Button
+          <Button
             size="small"
             variant="outlined"
             color="primary"
@@ -96,7 +106,7 @@ export const Header = () => {
             sx={{ display: { xs: 'none', sm: 'inline-flex' }, borderRadius: 2, textTransform: 'none' }}
           >
             Role: {ROLE_LABELS[authData?.role]?.split(' ')[0] || authData?.role}
-          </Button> */}
+          </Button>
 
           <Menu
             anchorEl={roleAnchor}
@@ -174,7 +184,7 @@ export const Header = () => {
               </Typography>
             </Box>
             <Divider />
-            <MenuItem onClick={logout} sx={{ color: 'error.main' }}>
+            <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
               <ListItemIcon>
                 <LogoutIcon fontSize="small" color="error" />
               </ListItemIcon>
@@ -188,4 +198,3 @@ export const Header = () => {
 };
 
 export default Header;
-

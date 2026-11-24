@@ -9,8 +9,12 @@ import {
   Typography,
   Divider
 } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-export const Sidebar = ({ menuItems = [], activeMenuId, onSelectMenu }) => {
+export const Sidebar = ({ menuItems = [] }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   return (
     <Box
       component="aside"
@@ -39,13 +43,13 @@ export const Sidebar = ({ menuItems = [], activeMenuId, onSelectMenu }) => {
       <List disablePadding sx={{ px: 1, flexGrow: 1 }}>
         {menuItems.map((item) => {
           const IconComponent = item.icon;
-          const isSelected = activeMenuId === item.id;
+          const isSelected = location.pathname === item.path;
 
           return (
             <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton
                 selected={isSelected}
-                onClick={() => onSelectMenu(item.id)}
+                onClick={() => navigate(item.path)}
                 sx={{
                   borderRadius: 2,
                   py: 1,
@@ -98,4 +102,3 @@ export const Sidebar = ({ menuItems = [], activeMenuId, onSelectMenu }) => {
 };
 
 export default Sidebar;
-

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Box, Container } from '@mui/material';
+import { Outlet } from 'react-router-dom';
 
-export const MainSection = ({ activeComponent: ActiveComponent, onNavigate }) => {
+export const MainSection = () => {
   return (
     <Box
       component="main"
@@ -15,15 +16,10 @@ export const MainSection = ({ activeComponent: ActiveComponent, onNavigate }) =>
       }}
     >
       <Container maxWidth="xl" disableGutters>
-        {ActiveComponent ? (
-          <ActiveComponent onNavigate={onNavigate} />
-        ) : (
-          <div>Please select a section from the sidebar.</div>
-        )}
+        <Outlet />
       </Container>
     </Box>
   );
 };
 
 export default MainSection;
-

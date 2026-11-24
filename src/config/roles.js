@@ -27,7 +27,7 @@ export const ROLE_HOME_ROUTES = {
   [ROLES.RECEPTIONIST]: '/receptionist/dashboard',
   [ROLES.DOCTOR]: '/doctor/dashboard',
   [ROLES.INVENTORY_MANAGER]: '/inventory/dashboard',
-  [ROLES.WARD_MANAGER]: '/wards/dashboard'
+  [ROLES.WARD_MANAGER]: '/ward/dashboard'
 };
 
 // Capabilities per role
@@ -82,4 +82,3 @@ export const ROLE_PERMISSIONS = {
     'discharges:process'
   ]
 };
-

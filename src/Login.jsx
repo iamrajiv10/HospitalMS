@@ -18,11 +18,13 @@ import LoginIcon from '@mui/icons-material/Login';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
 import { useAuth, PRESET_USERS } from './context/AuthContext';
-import { ROLE_LABELS } from './config/roles';
+import { ROLE_LABELS, ROLE_HOME_ROUTES } from './config/roles';
 
-export const Login = ({ onLoginSuccess }) => {
+export const Login = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -38,8 +40,9 @@ export const Login = ({ onLoginSuccess }) => {
     setLoading(true);
     try {
       const result = await login(email, password);
-      if (result.success && onLoginSuccess) {
-        onLoginSuccess(result.data);
+      if (result.success) {
+        const dest = ROLE_HOME_ROUTES[result.data.role] || '/hospital-admin/dashboard';
+        navigate(dest);
       }
     } catch (err) {
       setErrorMsg('Login failed. Please check your credentials.');
@@ -54,8 +57,9 @@ export const Login = ({ onLoginSuccess }) => {
     setLoading(true);
     const result = await login(preset.email, 'demo@123');
     setLoading(false);
-    if (result.success && onLoginSuccess) {
-      onLoginSuccess(result.data);
+    if (result.success) {
+      const dest = ROLE_HOME_ROUTES[preset.role] || '/hospital-admin/dashboard';
+      navigate(dest);
     }
   };
 
@@ -212,4 +216,3 @@ export const Login = ({ onLoginSuccess }) => {
 };
 
 export default Login;
-

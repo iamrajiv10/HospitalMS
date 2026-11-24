@@ -5,11 +5,14 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import { useNavigate } from 'react-router-dom';
 
 import PageHeader from '../common/PageHeader';
 import StatCard from '../common/StatCard';
 
-export const WardDashboard = ({ onNavigate }) => {
+export const WardDashboard = () => {
+  const navigate = useNavigate();
+
   const wardOverview = [
     { ward: 'Intensive Care Unit (ICU)', totalBeds: 24, occupied: 21, available: 3, occupancy: '87.5%' },
     { ward: 'Cardiac Care Unit (CCU)', totalBeds: 18, occupied: 14, available: 4, occupancy: '77.7%' },
@@ -28,7 +31,7 @@ export const WardDashboard = ({ onNavigate }) => {
           <Button
             variant="contained"
             startIcon={<AddTaskIcon />}
-            onClick={() => onNavigate && onNavigate('beds')}
+            onClick={() => navigate('/ward/beds')}
           >
             Allocate Bed
           </Button>
@@ -80,7 +83,7 @@ export const WardDashboard = ({ onNavigate }) => {
             <Typography variant="h6" fontWeight={700}>
               Hospital Ward Occupancy Live Summary
             </Typography>
-            <Button size="small" onClick={() => onNavigate && onNavigate('beds')}>
+            <Button size="small" onClick={() => navigate('/ward/beds')}>
               View Bed Matrix
             </Button>
           </Stack>
@@ -122,4 +125,3 @@ export const WardDashboard = ({ onNavigate }) => {
 };
 
 export default WardDashboard;
-

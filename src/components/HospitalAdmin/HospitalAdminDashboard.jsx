@@ -5,14 +5,16 @@ import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import { useNavigate } from 'react-router-dom';
 
 import PageHeader from '../common/PageHeader';
 import StatCard from '../common/StatCard';
 import { useAuth } from '../../context/AuthContext';
 import { MOCK_USERS } from '../../services/mockData';
 
-export const HospitalAdminDashboard = ({ onNavigate }) => {
+export const HospitalAdminDashboard = () => {
   const { authData } = useAuth();
+  const navigate = useNavigate();
   const hospitalStaff = MOCK_USERS.filter((u) => u.tenantId === authData?.hospital_id);
 
   return (
@@ -25,7 +27,7 @@ export const HospitalAdminDashboard = ({ onNavigate }) => {
           <Button
             variant="contained"
             startIcon={<PersonAddAlt1Icon />}
-            onClick={() => onNavigate && onNavigate('staff')}
+            onClick={() => navigate('/hospital-admin/staff')}
           >
             Add New Staff Member
           </Button>
@@ -77,7 +79,7 @@ export const HospitalAdminDashboard = ({ onNavigate }) => {
             <Typography variant="h6" fontWeight={700}>
               Hospital Personnel (Tenant: {authData?.hospital_id || 'Active'})
             </Typography>
-            <Button size="small" onClick={() => onNavigate && onNavigate('staff')}>
+            <Button size="small" onClick={() => navigate('/hospital-admin/staff')}>
               Manage All Staff
             </Button>
           </Stack>
@@ -115,4 +117,3 @@ export const HospitalAdminDashboard = ({ onNavigate }) => {
 };
 
 export default HospitalAdminDashboard;
-

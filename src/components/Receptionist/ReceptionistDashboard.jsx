@@ -5,11 +5,14 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { useNavigate } from 'react-router-dom';
 
 import PageHeader from '../common/PageHeader';
 import StatCard from '../common/StatCard';
 
-export const ReceptionistDashboard = ({ onNavigate }) => {
+export const ReceptionistDashboard = () => {
+  const navigate = useNavigate();
+
   const todayAppointments = [
     { id: 'APT-101', patient: 'Rahul Verma', doctor: 'Dr. Arvind Kejriwal (Cardiology)', time: '09:30 AM', status: 'Checked In' },
     { id: 'APT-102', patient: 'Anita Desai', doctor: 'Dr. Priya Singh (Pediatrics)', time: '10:15 AM', status: 'Waiting' },
@@ -27,7 +30,7 @@ export const ReceptionistDashboard = ({ onNavigate }) => {
           <Button
             variant="contained"
             startIcon={<PersonAddIcon />}
-            onClick={() => onNavigate && onNavigate('patients')}
+            onClick={() => navigate('/receptionist/patients')}
           >
             Register Patient
           </Button>
@@ -79,7 +82,7 @@ export const ReceptionistDashboard = ({ onNavigate }) => {
             <Typography variant="h6" fontWeight={700}>
               Today's Live Appointment Queue
             </Typography>
-            <Button size="small" onClick={() => onNavigate && onNavigate('appointments')}>
+            <Button size="small" onClick={() => navigate('/receptionist/appointments')}>
               View All
             </Button>
           </Stack>
@@ -119,4 +122,3 @@ export const ReceptionistDashboard = ({ onNavigate }) => {
 };
 
 export default ReceptionistDashboard;
-
